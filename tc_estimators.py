@@ -12,7 +12,7 @@ class TotalCorEstimator(nn.Module):
         Calculate Total Correlation Estimation for variable X1, X2,..., Xn, each Xi dimension = dim, n = num_var
         '''
         super(TotalCorEstimator, self).__init__()
-        self.mi_estimators = nn.ModuleList([eval(mi_est_name)(dim * (i+1), dim, hidden_size * np.sqrt(i+1)) for i in range(num_var-1)])
+        self.mi_estimators = nn.ModuleList([eval(mi_est_name)(dim * (i+1), dim, int(hidden_size * np.sqrt(i+1))) for i in range(num_var-1)])
     
     def forward(self, samples): # samples is a tensor with shape [batch, num_var, dim]
         batch_size, num_var, dim = samples.size()
@@ -22,7 +22,7 @@ class TotalCorEstimator(nn.Module):
         return torch.stack(outputs).sum()
 
     def learning_loss(self, samples):
-        batch_size, num_var, dim = smaples.size()
+        batch_size, num_var, dim = samples.size()
         outputs = []
         for i in range(1, num_var):
             outputs.append(self.mi_estimators[i-1].learning_loss(samples[:,:i].flatten(start_dim = 1), samples[:,i]))

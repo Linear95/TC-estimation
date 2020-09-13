@@ -19,6 +19,7 @@ class CLUB(nn.Module):  # CLUB: Mutual Information Contrastive Learning Upper Bo
     def __init__(self, x_dim, y_dim, hidden_size):
         super(CLUB, self).__init__()
         # p_mu outputs mean of q(Y|X)
+        print("create CLUB with dim {}, {}, hiddensize {}".format(x_dim, y_dim, hidden_size))
         self.p_mu = nn.Sequential(nn.Linear(x_dim, hidden_size//2),
                                        nn.ReLU(),
                                        nn.Linear(hidden_size//2, y_dim))
@@ -90,7 +91,7 @@ class CLUBSample(nn.Module):  # Sampled version of the CLUB estimator
         upper_bound = (positive.sum(dim = -1) - negative.sum(dim = -1)).mean()
         return upper_bound/2.
 
-     def learning_loss(self, x_samples, y_samples):
+    def learning_loss(self, x_samples, y_samples):
         return - self.loglikeli(x_samples, y_samples)
 
 
@@ -230,7 +231,7 @@ class L1OutUB(nn.Module):  # naive upper bound
         mu, logvar = self.get_mu_logvar(x_samples)
         return (-(mu - y_samples)**2 /logvar.exp()-logvar).sum(dim=1).mean(dim=0)
 
-     def learning_loss(self, x_samples, y_samples):
+    def learning_loss(self, x_samples, y_samples):
         return - self.loglikeli(x_samples, y_samples)
 
     
@@ -259,7 +260,7 @@ class VarUB(nn.Module):  #    variational upper bound
         mu, logvar = self.get_mu_logvar(x_samples)
         return (-(mu - y_samples)**2 /logvar.exp()-logvar).sum(dim=1).mean(dim=0)
 
-     def learning_loss(self, x_samples, y_samples):
+    def learning_loss(self, x_samples, y_samples):
         return - self.loglikeli(x_samples, y_samples)
 
     

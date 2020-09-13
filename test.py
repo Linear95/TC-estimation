@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import torch.nn as nn
 import time
 
@@ -60,7 +60,7 @@ from tc_estimators import *
 mi_results = dict()
 for i, model_name in enumerate(model_list):
     
-    model = TotalCorEstimator(2, sample_dim, hidden_size, model_list[i])
+    model = TotalCorEstimator(2, sample_dim, hidden_size, model_list[i]).cuda()
     optimizer = torch.optim.Adam(model.parameters(), learning_rate)
 
     mi_est_values = []
@@ -73,10 +73,11 @@ for i, model_name in enumerate(model_list):
             batch_x, batch_y = sample_correlated_gaussian(rho, dim=sample_dim, batch_size = batch_size, to_cuda = True, cubic = cubic)
 
             model.eval()
-            mi_est_values.append(model(batch_x, batch_y).item())
+            samples = torch.stack([batch_x, batch_y], dim=1) #[batch,2,dim]
+            mi_est_values.append(model(samples).item())
             
             model.train() 
-            model_loss = model.learning_loss(batch_x, batch_y)
+            model_loss = model.learning_loss(samples)
            
             optimizer.zero_grad()
             model_loss.backward()
