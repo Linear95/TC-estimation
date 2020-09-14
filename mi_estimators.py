@@ -19,7 +19,7 @@ class CLUB(nn.Module):  # CLUB: Mutual Information Contrastive Learning Upper Bo
     def __init__(self, x_dim, y_dim, hidden_size):
         super(CLUB, self).__init__()
         # p_mu outputs mean of q(Y|X)
-        print("create CLUB with dim {}, {}, hiddensize {}".format(x_dim, y_dim, hidden_size))
+        #print("create CLUB with dim {}, {}, hiddensize {}".format(x_dim, y_dim, hidden_size))
         self.p_mu = nn.Sequential(nn.Linear(x_dim, hidden_size//2),
                                        nn.ReLU(),
                                        nn.Linear(hidden_size//2, y_dim))
@@ -118,7 +118,7 @@ class MINE(nn.Module):
         return lower_bound
     
     def learning_loss(self, x_samples, y_samples):
-        reutrn -self.forward(x_samples, y_samples)
+        return -self.forward(x_samples, y_samples)
 
     
 class NWJ(nn.Module):   
@@ -142,7 +142,7 @@ class NWJ(nn.Module):
         return lower_bound
     
     def learning_loss(self, x_samples, y_samples):
-        reutrn -self.forward(x_samples, y_samples)
+        return -self.forward(x_samples, y_samples)
 
 
     
@@ -168,7 +168,7 @@ class InfoNCE(nn.Module):
         return lower_bound
 
     def learning_loss(self, x_samples, y_samples):
-        reutrn -self.forward(x_samples, y_samples)
+        return -self.forward(x_samples, y_samples)
 
 
 
