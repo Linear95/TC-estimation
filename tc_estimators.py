@@ -6,25 +6,24 @@ import torch.nn as nn
 
 from mi_estimators import *
 
-class TotalCorEstimator(nn.Module):
+class Line_TC_Estimator(nn.Module):
     def __init__(self, num_var, dim, hidden_size, mi_est_name = "CLUB"):  
         '''
         Calculate Total Correlation Estimation for variable X1, X2,..., Xn, each Xi dimension = dim, n = num_var
         '''
-        super(TotalCorEstimator, self).__init__()
+        super(Line_TC_Estimator, self).__init__()
+        self.num_var = num_var
         self.mi_estimators = nn.ModuleList([eval(mi_est_name)(dim * (i+1), dim, int(hidden_size * np.sqrt(i+1))) for i in range(num_var-1)])
     
     def forward(self, samples): # samples is a tensor with shape [batch, num_var, dim]
-        batch_size, num_var, dim = samples.size()
         outputs = []
-        for i in range(1, num_var):
+        for i in range(1, self.num_var):
             outputs.append(self.mi_estimators[i-1](samples[:,:i].flatten(start_dim = 1), samples[:,i]))
         return torch.stack(outputs).sum()
 
     def learning_loss(self, samples):
-        batch_size, num_var, dim = samples.size()
         outputs = []
-        for i in range(1, num_var):
+        for i in range(1, self.num_var):
             outputs.append(self.mi_estimators[i-1].learning_loss(samples[:,:i].flatten(start_dim = 1), samples[:,i]))
         return torch.stack(outputs).mean()
 
@@ -37,7 +36,6 @@ class Tree_TC_Estimator(nn.Module):
         self.hidden_size = hidden_size
         self.est_index = []
         self.root = self._build_tree(0, num_var-1)
-        print(self.est_index)
         estimator_list = [eval(mi_est_name)((mid-l+1)*dim, (r-mid)*dim, int(hidden_size*np.sqrt(r-l))) for (l, mid, r) in self.est_index]
         #print(estimator_list)
         # while 
