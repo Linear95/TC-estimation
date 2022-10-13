@@ -1,4 +1,4 @@
-# Estimating Total Correlation with Mutual Information Bounds
+# Estimating Total Correlation with Mutual Information Estimators
 
 In this repo, we extend the mutual information (MI) estimation into multi-variate scenarios. Details about our method is summarized in our NeurIPS 2020 workshop: [Estimating Total Correlation with Mutual Information Bounds](https://openreview.net/pdf?id=UsDZut_p2LG).
 
