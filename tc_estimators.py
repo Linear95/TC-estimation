@@ -4,46 +4,59 @@ import math
 import torch 
 import torch.nn as nn
 
-from mi_estimators import CLUB, CLUBSample, CLUBMean, MINE, NWJ, InfoNCE, L1OutUB, VarUB
+from mi_estimators import  CLUBMean, MINE, NWJ, InfoNCE
 
 MI_CLASS={
-    'CLUB': CLUB,
-    'CLUBSample': CLUBSample,
-    'CLUBMean': CLUBMean,
+    'CLUB': CLUBMean,
     'MINE': MINE,
     'NWJ': NWJ,
     'InfoNCE': InfoNCE,
-    'L1OutUB': L1OutUB,
-    'VarUB': VarUB
     }
 
 class TCLineEstimator(nn.Module):
-    def __init__(self, num_var, dim, hidden_size, mi_est_name = 'CLUB'):  
+    def __init__(self, dims, hidden_size=None, mi_estimator='CLUB'):  
         '''
-        Calculate Total Correlation Estimation for variable X1, X2,..., Xn, each Xi dimension = dim, n = num_var.
+        Calculate Total Correlation Estimation for variable X1, X2,..., Xn, each Xi dimension = dim_i
+        args:
+            dims: a list of variable dimensions, [dim_1, dim_2,..., dim_n]
+            hidden_size: hidden_size of vairiational MI estimators
+            mi_estimator: the used MI estimator, selected from MI_CLASS
         '''
         super().__init__()
-        self.num_var = num_var
-        self.mi_est_name = mi_est_name
-        self.mi_class = MI_CLASS[mi_est_name]
-        
-        self.mi_estimators = nn.ModuleList(
-            [self.mi_class(
-                x_dim=dim * (i+1),
+        self.dims = dims
+        self.mi_est_type = MI_CLASS[mi_estimator]
+
+        mi_estimator_list = [
+            self.mi_est_type(
+                x_dim=sum(dims[:i+1]),
                 y_dim=dim,
-                hidden_size=int(hidden_size * np.sqrt(i+1))
-                )
-             for i in range(num_var-1)
-            ]
-        )
+                hidden_size=(None if hidden_size is None else hidden_size * np.sqrt(i+1))
+            )
+            for i, dim in enumerate(dims[:-1])
+        ]
+            
+        self.mi_estimators = nn.ModuleList(mi_estimator_list)
+        
+        # self.mi_estimators = nn.ModuleList(
+        #     [self.mi_est_type(
+        #         x_dim=dim * (i+1),
+        #         y_dim=dim,
+        #         hidden_size=int(hidden_size * np.sqrt(i+1))
+        #         )
+        #      for i in range(num_var-1)
+        #     ]
+        # )
     
-    def forward(self, samples): # samples is a tensor with shape [batch, num_var, dim]
+    def forward(self, samples): # samples is a list of tensors with shape [Tensor([batch, dim_i])]
         '''
         forward the estimated total correlation value with the given samples.
         '''
         outputs = []
-        for i in range(1, self.num_var):
-            outputs.append(self.mi_estimators[i-1](samples[:,:i].flatten(start_dim = 1), samples[:,i]))
+        concat_samples = [samples[0]]
+        for i, dim in enumerate(self.dims[1:]):
+            cat_sample = torch.cat(concat_samples, dim=1)
+            outputs.append(self.mi_estimators[i](cat_sample, samples[i+1]))
+            concat_samples.append(samples[i+1])
         return torch.stack(outputs).sum()
 
     def learning_loss(self, samples):
@@ -51,56 +64,63 @@ class TCLineEstimator(nn.Module):
         return the learning loss to train the parameters of mi estimators.
         '''
         outputs = []
-        for i in range(1, self.num_var):
-            outputs.append(self.mi_estimators[i-1].learning_loss(samples[:,:i].flatten(start_dim = 1), samples[:,i]))
+        concat_samples = [samples[0]]
+        for i, dim in enumerate(self.dims[1:]):
+            cat_sample = torch.cat(concat_samples, dim=1)
+            outputs.append(self.mi_estimators[i].learning_loss(cat_sample, samples[i+1]))
+            concat_samples.append(samples[i+1])
+        # for i in range(1, self.num_var):
+        #     outputs.append(self.mi_estimators[i-1].learning_loss(samples[:,:i].flatten(start_dim = 1), samples[:,i]))
         return torch.stack(outputs).mean()
 
 
 class TCTreeEstimator(nn.Module):
-    def __init__(self, num_var, dim, hidden_size, mi_est_name = 'CLUB'):
+    def __init__(self, dims, hidden_size=None, mi_estimator='CLUB'):
         super().__init__()
-        self.num_var = num_var
-        self.mi_est_name = mi_est_name
-        self.mi_class = MI_CLASS[mi_est_class]
+        self.dims = dims
+        self.mi_est_type = MI_CLASS[mi_estimator]
         
-        self.est_index = []
-        self.root = self._build_tree(0, num_var-1)
+        self.idx_scheme = []  # dims[left_idx: mid_idx] and dims[mid_idx: right_idx]
+        self._build_idx_scheme(0, len(dims))
         
-        estimator_list = [mi_est_class((mid-l+1)*dim, (r-mid)*dim, int(hidden_size*np.sqrt(r-l))) for (l, mid, r) in self.est_index]
+        mi_estimator_list = [
+            self.mi_est_type(
+                x_dim=sum(dims[l:m]),
+                y_dim=sum(dims[m:r]),
+                hidden_size=(None if hidden_size is None else hidden_size * np.sqrt(r-l-1))
+            )
+            for l, m, r in self.idx_scheme
+        ]                                                        
+        
+        #estimator_list = [self.mi_class((mid-l+1)*dim, (r-mid)*dim, int(hidden_size*np.sqrt(r-l))) for (l, mid, r) in self.est_index]
+        self.mi_estimators = nn.ModuleList(mi_estimator_list)
 
-        self.mi_estimators = nn.ModuleList(estimator_list)
+    def _build_idx_scheme(self, left_idx, right_idx):
+        if right_idx-left_idx > 1:
+            mid_idx = (right_idx + left_idx) // 2
+            self.idx_scheme.append((left_idx, mid_idx, right_idx))
+            self._build_idx_scheme(left_idx, mid_idx)
+            self._build_idx_scheme(mid_idx, right_idx)
 
-    def _build_tree(self, l, r):
-        if r-l <= 0:
-            return
-        else:
-            mid = (r+l)//2
-            self.est_index.append((l, mid, r))
-            self._build_tree(l, mid)
-            self._build_tree(mid+1, r)
-            return 
 
     def forward(self, samples):
-        output_list = []
-        for i, (l, mid, r) in enumerate(self.est_index):
-            output_list.append(
+        outputs = []
+        for i, (l, m, r) in enumerate(self.idx_scheme):
+            outputs.append(
                 self.mi_estimators[i](
-                    samples[:,l:mid+1].flatten(start_dim=1), 
-                    samples[:,mid+1:r+1].flatten(start_dim=1)
+                    x_samples=torch.cat(samples[l:m], dim=1),
+                    y_samples=torch.cat(samples[m:r], dim=1)                    
                 )
-            )
-            
-        #print(mi_output_list)
-        return torch.stack(output_list).sum()
+            )            
+        return torch.stack(outputs).sum()
 
     def learning_loss(self, samples):
-        output_list = []
-        for i, (l, mid, r) in enumerate(self.est_index):
-            output_list.append(
+        outputs = []
+        for i, (l, m, r) in enumerate(self.idx_scheme):
+            outputs.append(
                 self.mi_estimators[i].learning_loss(
-                    samples[:,l:mid+1].flatten(start_dim=1), 
-                    samples[:,mid+1:r+1].flatten(start_dim=1)
+                    x_samples=torch.cat(samples[l:m], dim=1),
+                    y_samples=torch.cat(samples[m:r], dim=1)                    
                 )
-            )
-            
-        return torch.stack(output_list).sum()
+            )                        
+        return torch.stack(outputs).sum()
