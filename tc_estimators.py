@@ -4,11 +4,12 @@ import math
 import torch 
 import torch.nn as nn
 
-from mi_estimators import CLUB, CLUBSample, MINE, NWJ, InfoNCE, L1OutUB, VarUB
+from mi_estimators import CLUB, CLUBSample, CLUBMean, MINE, NWJ, InfoNCE, L1OutUB, VarUB
 
 MI_CLASS={
     'CLUB': CLUB,
     'CLUBSample': CLUBSample,
+    'CLUBMean': CLUBMean,
     'MINE': MINE,
     'NWJ': NWJ,
     'InfoNCE': InfoNCE,
