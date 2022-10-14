@@ -2,34 +2,59 @@
 
 This repo contains the implementation of the NeurIPS 2020 workshop paper: [Estimating Total Correlation with Mutual Information Bounds](https://openreview.net/pdf?id=UsDZut_p2LG).
 
-Mutual information (MI) is a fundamental measurement of variable correlation:
-$$\left \{ \begin{array}
-\mathcal{I}({x}; {y}) = \mathbb{E}_{p(x, y) [\log \frac{p(x, y)}{p(x) p(y)}]
-\end{array} \right .$$
-
-
-
-$$\left \{ \begin{array}
-\mathcal{I}(\bm{x}; \bm{y}) = \mathbb{E}_{p(\bm{x}, \bm{y}) [\log \frac{p(\bm{x}, \bm{y})}{p(\bm{x}) p(\bm{y})}]
-\end{array} \right .$$
-
-
-We designed two 
+<p align="center">
+  <img src="https://github.com/Linear95/TC-estimation/blob/master/figures/est_results.png" width="70%" height="70%">
+</p>
+The above figure shows the estimation performance of our TC-Tree and TC-Line estimators based on different mutual information estimators.
 
 ## Introduction
 
+We implement the `TCLineEstimator` and `TCTreeEstimator` in [`tc_estimators.py`](https://github.com/Linear95/TC-estimation/blob/master/tc_estimators.py).
 
-$$\left \{ \begin{array}{rll}
-\nabla \cdot \mathbf{E} &=& \displaystyle \frac {\rho} {\varepsilon_0} \\
-\nabla \cdot \mathbf{B} &=& 0 \\
-\nabla \times \mathbf{E} &=& \displaystyle - \frac{\partial \mathbf{B}} {\partial t} \\
-\nabla \times \mathbf{B} &=& \displaystyle \mu_0\mathbf{J} + \mu_0 \varepsilon_0 \frac{\partial \mathbf{E}} {\partial t}  \\
-\end{array} \right .$$
+Both TC estimators are based on MI estimators ([NWJ](https://media.gradebuddy.com/documents/2949555/12a1c544-de73-4e01-9d24-2f7c347e9a20.pdf), [MINE](http://proceedings.mlr.press/v80/belghazi18a), [InfoNCE](https://arxiv.org/pdf/1807.03748.pdf), [CLUB](https://arxiv.org/abs/2006.12013)) in [`mi_estimators.py`](https://github.com/Linear95/TC-estimation/blob/master/mi_estimators.py).
 
-We know that mutual information measures the dependency between two variables:
-$$ \begin{equation}
-\mathcal{I}(\bm{x}; \bm{y}) = \mathbb{E}_{p(\bm{x}, \bm{y}) [\log \frac{p(\bm{x}, \bm{y})}{p(\bm{x}) p(\bm{y})}]
-\end{equation}
-$$
+In [`tc_estimation.ipynb`](https://github.com/Linear95/TC-estimation/blob/master/tc_estimation.ipynb), we conduct a toy simulation to test the estimation ability of our TC estimators.
 
-Run 'test.py' to check the examlpe of total correlation estimator.
+
+## Method
+
+Mutual information (MI) is a fundamental measurement of correlation between two variables:
+<p align="center">
+  <img src="https://github.com/Linear95/TC-estimation/blob/master/figures/eq_mi_definition.png"  height="40">
+</p>
+
+Total correlation (TC) is an extension of MI for multi-variate scenarios:
+<p align="center">
+  <img src="https://github.com/Linear95/TC-estimation/blob/master/figures/eq_tc_definition.png" height="40">
+</p>
+
+We introduce two calculation paths to decomposite the total correlation into mutual information terms:
+
+- Line-like decomposition:
+<p align="center">
+  <img src="https://github.com/Linear95/TC-estimation/blob/master/figures/eq_line_decomp.png" height="18">
+</p>
+
+
+- Tree-like decomposition:
+<p align="center">
+  <img src="https://github.com/Linear95/TC-estimation/blob/master/figures/eq_tree_decomp.png" height="22">
+</p>
+
+The calculation paths are demonstrated in the following figure:
+<p align="center">
+  <img src="https://github.com/Linear95/TC-estimation/blob/master/figures/decomp_scheme.png" height="120">
+</p>
+
+## Citation
+Welcome to cite our paper if the code is useful:
+
+```latex
+@article{cheng2020estimating,
+  title={Estimating total correlation with mutual information bounds},
+  author={Cheng, Pengyu and Hao, Weituo and Carin, Lawrence},
+  journal={arXiv preprint arXiv:2011.04794},
+  year={2020}
+}
+```
+
