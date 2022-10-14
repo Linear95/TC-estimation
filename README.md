@@ -1,6 +1,14 @@
-# Estimating Total Correlation with Mutual Information Estimators
+# Total Correlation (TC) Estimation
 
-In this repo, we extend the mutual information (MI) estimation into multi-variate scenarios. Details about our method is summarized in our NeurIPS 2020 workshop: [Estimating Total Correlation with Mutual Information Bounds](https://openreview.net/pdf?id=UsDZut_p2LG).
+This repo contains the implementation of the NeurIPS 2020 workshop paper: [Estimating Total Correlation with Mutual Information Bounds](https://openreview.net/pdf?id=UsDZut_p2LG).
+
+Mutual information (MI) is a fundamental measurement of variable correlation:
+$$\left \{ \begin{array}
+\mathcal{I}(\bm{x}; \bm{y}) = \mathbb{E}_{p(\bm{x}, \bm{y}) [\log \frac{p(\bm{x}, \bm{y})}{p(\bm{x}) p(\bm{y})}]
+\end{array} \right .$$
+
+
+We designed two 
 
 ## Introduction
 
