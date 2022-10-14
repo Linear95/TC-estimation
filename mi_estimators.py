@@ -7,10 +7,11 @@ import torch.nn as nn
     
 class CLUBMean(nn.Module):  # Set variance of q(y|x) to 1, logvar = 0.
     def __init__(self, x_dim, y_dim, hidden_size=None):
-        super(CLUBMean, self).__init__()
         # p_mu outputs mean of q(Y|X)
         # print("create CLUB with dim {}, {}, hiddensize {}".format(x_dim, y_dim, hidden_size))
-        # print('debug x{} y{} h{}'.format( x_dim, y_dim, hidden_size))
+        
+        super(CLUBMean, self).__init__()
+   
         if hidden_size is None:
             self.p_mu = nn.Linear(x_dim, y_dim)
         else:
@@ -18,16 +19,14 @@ class CLUBMean(nn.Module):  # Set variance of q(y|x) to 1, logvar = 0.
                                        nn.ReLU(),
                                        nn.Linear(int(hidden_size), y_dim))
 
-#        print(self.p_mu)
 
     def get_mu_logvar(self, x_samples):
+        # variance is set to 0, which means logvar=0
         mu = self.p_mu(x_samples)
         return mu, 0
     
     def forward(self, x_samples, y_samples):
-#        print('debug, x shape', x_samples.shape)
- #       print('debug, y shape', y_samples.shape)
-        
+
         mu, logvar = self.get_mu_logvar(x_samples)
         
         # log of conditional probability of positive sample pairs

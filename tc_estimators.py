@@ -37,15 +37,6 @@ class TCLineEstimator(nn.Module):
             
         self.mi_estimators = nn.ModuleList(mi_estimator_list)
         
-        # self.mi_estimators = nn.ModuleList(
-        #     [self.mi_est_type(
-        #         x_dim=dim * (i+1),
-        #         y_dim=dim,
-        #         hidden_size=int(hidden_size * np.sqrt(i+1))
-        #         )
-        #      for i in range(num_var-1)
-        #     ]
-        # )
     
     def forward(self, samples): # samples is a list of tensors with shape [Tensor([batch, dim_i])]
         '''
@@ -69,8 +60,7 @@ class TCLineEstimator(nn.Module):
             cat_sample = torch.cat(concat_samples, dim=1)
             outputs.append(self.mi_estimators[i].learning_loss(cat_sample, samples[i+1]))
             concat_samples.append(samples[i+1])
-        # for i in range(1, self.num_var):
-        #     outputs.append(self.mi_estimators[i-1].learning_loss(samples[:,:i].flatten(start_dim = 1), samples[:,i]))
+
         return torch.stack(outputs).mean()
 
 
@@ -92,10 +82,10 @@ class TCTreeEstimator(nn.Module):
             for l, m, r in self.idx_scheme
         ]                                                        
         
-        #estimator_list = [self.mi_class((mid-l+1)*dim, (r-mid)*dim, int(hidden_size*np.sqrt(r-l))) for (l, mid, r) in self.est_index]
         self.mi_estimators = nn.ModuleList(mi_estimator_list)
 
     def _build_idx_scheme(self, left_idx, right_idx):
+        # split variables [left_idx : right_idx] to variables [left_idx: mid_idx] and [mid_idx, right_idx]
         if right_idx-left_idx > 1:
             mid_idx = (right_idx + left_idx) // 2
             self.idx_scheme.append((left_idx, mid_idx, right_idx))
