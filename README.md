@@ -3,9 +3,9 @@
 This repo contains the implementation of the NeurIPS 2020 workshop paper: [Estimating Total Correlation with Mutual Information Bounds](https://openreview.net/pdf?id=UsDZut_p2LG).
 
 <p align="center">
-  <img src="https://github.com/Linear95/TC-estimation/blob/master/figures/est_results.png" width="70%" height="70%">
+  <img src="https://github.com/Linear95/TC-estimation/blob/master/figures/est_results.png" width="75%" height="75%">
 </p>
-The above figure shows the estimation performance of our TC-Tree and TC-Line estimators based on different mutual information estimators.
+The above figure shows the estimation performance of our TC-Tree and TC-Line estimators based on different mutual information (MI) estimators.
 
 ## Introduction
 
