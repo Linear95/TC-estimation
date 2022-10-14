@@ -4,6 +4,12 @@ This repo contains the implementation of the NeurIPS 2020 workshop paper: [Estim
 
 Mutual information (MI) is a fundamental measurement of variable correlation:
 $$\left \{ \begin{array}
+\mathcal{I}({x}; {y}) = \mathbb{E}_{p(x, y) [\log \frac{p(x, y)}{p(x) p(y)}]
+\end{array} \right .$$
+
+
+
+$$\left \{ \begin{array}
 \mathcal{I}(\bm{x}; \bm{y}) = \mathbb{E}_{p(\bm{x}, \bm{y}) [\log \frac{p(\bm{x}, \bm{y})}{p(\bm{x}) p(\bm{y})}]
 \end{array} \right .$$
 
