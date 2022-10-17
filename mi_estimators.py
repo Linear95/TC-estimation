@@ -21,7 +21,7 @@ class CLUBMean(nn.Module):  # Set variance of q(y|x) to 1, logvar = 0.
 
 
     def get_mu_logvar(self, x_samples):
-        # variance is set to 0, which means logvar=0
+        # variance is set to 1, which means logvar=0
         mu = self.p_mu(x_samples)
         return mu, 0
     
