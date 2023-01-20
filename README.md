@@ -1,6 +1,6 @@
 # Total Correlation (TC) Estimation
 
-This repo contains the implementation of the NeurIPS 2020 workshop paper: [Estimating Total Correlation with Mutual Information Bounds](https://openreview.net/pdf?id=UsDZut_p2LG).
+This repo contains the implementation of the AISTATS 2023 paper: [Estimating Total Correlation with Mutual Information Estimators](https://openreview.net/pdf?id=UsDZut_p2LG).
 
 <p align="center">
   <img src="https://github.com/Linear95/TC-estimation/blob/master/figures/est_results.png" width="75%" height="75%">
