@@ -1,6 +1,6 @@
 # Total Correlation (TC) Estimation
 
-This repo contains the implementation of the AISTATS 2023 paper: [Estimating Total Correlation with Mutual Information Estimators](https://openreview.net/pdf?id=UsDZut_p2LG).
+This repo contains the implementation of the AISTATS 2023 paper: [Estimating Total Correlation with Mutual Information Estimators](https://proceedings.mlr.press/v206/bai23a.html).
 
 <p align="center">
   <img src="https://github.com/Linear95/TC-estimation/blob/master/figures/est_results.png" width="75%" height="75%">
@@ -48,13 +48,18 @@ The calculation paths are demonstrated in the following figure:
 
 ## Citation
 Welcome to cite our paper if the code is useful:
-
 ```latex
-@article{cheng2020estimating,
-  title={Estimating total correlation with mutual information bounds},
-  author={Cheng, Pengyu and Hao, Weituo and Carin, Lawrence},
-  journal={arXiv preprint arXiv:2011.04794},
-  year={2020}
+@InProceedings{pmlr-v206-bai23a,
+  title = {Estimating Total Correlation with Mutual Information Estimators},
+  author = {Bai, Ke and Cheng, Pengyu and Hao, Weituo and Henao, Ricardo and Carin, Larry},
+  booktitle = {Proceedings of The 26th International Conference on Artificial Intelligence and Statistics},
+  pages = {2147--2164},
+  year = {2023},
+  volume = {206},
+  series = {Proceedings of Machine Learning Research},
+  month = {25--27 Apr},
+  publisher = {PMLR},
+  url = {https://proceedings.mlr.press/v206/bai23a.html}
 }
 ```
 
